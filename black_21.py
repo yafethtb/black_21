@@ -1,8 +1,18 @@
 import random
 
-# ---- INITIALIZATION ----
-# Cards
-the_card = {
+# --- OPENING ---
+print('''
+    ========
+
+    WELCOME TO PYTHON CASINO!
+    THIS IS BLACKJACK TABLE.
+    LET'S TRY YOUR LUCK!
+
+    ========
+''')
+
+# --- Declare card deck ---
+deck = {
     "2" : 2,
     "3" : 3,
     "4" : 4,
@@ -18,135 +28,113 @@ the_card = {
     "A" : 11,
 }
 
-# Initial account
-initial = int(input("How many dollars you bring to the table?  $"))
+# --- Declare Money ---
+account = int(input("Please input your chip total values: > $ "))
 
-# ---- Functions ----
-# ---- Betting function ----
-def bet(acc):
-    ''' Betting function '''
-    while True:
-        your_bet = int(input("How many you willing to bet?  $"))
-        if your_bet > acc:
-            print("Your bet is higher than your account. Please repeat all.")
-            continue
-        else:            
-            return your_bet
+# --- Draw hand ---
 
-# ---- Draw cards ----
-def dealing(cards):
-    ''' Dealing card function. Return card lists and their value. '''
-    print("Game start.")
-    your_card = [random.choice(list(cards.keys())) for i in range(0, 2)] 
-    your_val =  sum(cards[i] for i in your_card)
-    dealer_card = [random.choice(list(cards.keys())) for i in range(0, 2)]
-    dealer_val = sum(cards[i] for i in dealer_card)
-    return your_card, your_val, dealer_card, dealer_val
+def deal_card(stack, qty):
+    ''' Return 2 card first, then 1 more card when player asked. '''
+    return [random.choice(list(stack.keys())) for i in range(0, qty)]
 
-# ---- Adding card ----
-def add_card(hand, cards):
-    '''Draw another card '''    
-    new_card = random.choice(list(cards.keys())) 
-    hand.append(new_card)
-    new_val = sum(cards[i] for i in hand)
-    return hand, new_val
+# --- Sum card value ---
+def value_card(stack, hand):
+    ''' Count value of all cards in hand '''
+    val = sum([stack[i] for i in stack if i in hand])
+    return val
 
-# ---- Compare hands ----
-# !--- open_hand() returns None ---!
-def open_hand(hand, hand_val, dealer_hand, dealer_val, acc, bet, cards):
-    ''' Checking both hands' cards value. Return user money amount.'''
-    if dealer_val <= 17:
-        # Triggered when the dealer's hand is under 17.
-        # !--- Open_hand() is not triggered ---!
-        print("Dealer's hand value is under 17. Dealer will draw another card.")
-        new_dealer_hand, new_dealer_val = add_card(dealer_hand, cards)
-        open_hand(hand, hand_val, new_dealer_hand, new_dealer_val, acc, bet, cards)
-    elif hand_val > 21 and dealer_val > 21:
-        # Will be triggered when your hand is more than 21.
-        print(f'Your hand is {hand} with value {hand_val}.\nDealer cards are{dealer_hand} with value {dealer_val}.')
-        print("Both hands are over 21. It's draw.")        
-    elif hand_val > 21 and dealer_val < 21:
-        # Will be triggered if user hand is over 21 and dealer's hand is under 21.
-        acc -= bet
-        print(f'Your hand is {hand} with value {hand_val}.\nDealer cards are{dealer_hand} with value {dealer_val}.')
-        print(f"You lose. Your money now is ${acc}.")        
-    elif hand_val < 21 and dealer_val > 21:
-        # Will be triggered if
-        acc += bet
-        print(f'Your hand is {hand} with value {hand_val}.\nDealer cards are{dealer_hand} with value {dealer_val}.')
-        print(f"You win! Your money now is ${acc}.")        
-    elif hand_val < 21 and dealer_val < 21:
-        # Triggered when both hands are under 21.
-        # Whoever have higher hand, wins.
-        if hand_val < dealer_val:
-            acc -= bet
-            print(f'Your hand is {hand} with value {hand_val}.\nDealer cards are{dealer_hand} with value {dealer_val}.')
-            print(f"You lose. Your money now is ${acc}.")            
-        elif hand_val > dealer_val:
-            acc += bet
-            print(f'Your hand is {hand} with value {hand_val}.\nDealer cards are{dealer_hand} with value {dealer_val}.')
-            print(f"You win! Your money now is ${acc}.")            
-        elif hand_val == dealer_val:
-            print(f'Your hand is {hand} with value {hand_val}.\nDealer cards are{dealer_hand} with value {dealer_val}.')
-            print("Both hands are same. It's draw.")
-        
-    return acc
-
-# --- Control if user will stop or continue.
-def if_continue(money, cards):
-    if money <= 0:
-        print("You're bankrupt.")
-        end_game(money)
-    else:
-        still_play = input("PLAY again? Press y to continue, or any keys if you want to stop:  > ").lower()
-        if still_play == "y":
-            game_21(money, cards)
-        else:
-            end_game(money)
-
-# ---- End game ----
+# --- GAME OVER ---
 def end_game(money):
-    print(f"Game over, your money is ${money}.") 
-    
-# ---- The body of program ----
-# ---- Combining all other functions ----
-# ---- Indirect recursion to game_21() from if_continue() ----
-def game_21(money, cards):
-    ''' Core game program.'''
-    put_bet = bet(money)
-    print("Let's begin the game.")
-    hand, hand_val, dealer_hand, dealer_val = dealing(cards)
-    print(f"Your hand is {hand} with value {hand_val}.\nDealer's first card is {dealer_hand[0]} with value {cards[dealer_hand[0]]}.")
-    
+    ''' Show message with amount of money when the game is over. '''
+    print(f"Game over. Your money is $ {money}.")
+
+# --- MAIN PROGRAM ---
+def blackjack(stack, chip):
+    ''' Main program. It checks bets and doing card dealing. '''
+    # --- Betting ---
     while True:
-        if hand_val < 21:
-            draw_more = input("DRAW again? Press y to continue, or any keys if you want to stand:  > ").lower()
-            if draw_more =="y":
-                hand, hand_val = add_card(hand, cards)
-                print(f"Your hand is {hand} with value {hand_val}.\nDealer's first card is {dealer_hand[0]} with value {cards[dealer_hand[0]]}.")
+        bet = int(input("Put how much chip you want to bet:  > $ "))
+        if bet > chip:
+            print("You can't bet chips you don't have. Please repeat.")            
+        else:
+            print("You can continue.")
+            break
+    
+    # --- Dealing card ---
+    print("Dealing card.")
+    player_hand = deal_card(stack, 2)
+    dealer_hand = deal_card(stack, 2)
+    player_value = value_card(stack, player_hand)
+    dealer_value = value_card(stack, dealer_hand)
+
+    # --- Showing card ---
+    print(f"Player's hand: {player_hand}; value: {player_value}")
+    print(f"Dealer's first card: {dealer_hand[0]}; value: {stack[dealer_hand[0]]}")
+
+    # --- Comparing hands ---
+    while True:
+        if player_value == 21:
+            print("Blackjack! Player wins!")
+            chip += bet
+            break
+        elif player_value > 21:
+            print("Your hand is higher than 21. You lose.")
+            chip -= bet
+            break
+        elif player_value < 21:
+            add_card = input("Do you want to ADD card? Press y to continue, press any other keys to open card:  > ").lower()
+            if add_card == "y":
+                print("Adding a card.")              
+                player_hand += deal_card(stack, 1)
+                player_value = value_card(stack, player_hand)
+                
+                print(f"Player's hand: {player_hand}; value: {player_value}.")
                 continue
             else:
-                # !--- PROBLEM: open_hand() return None ---!
-                # !--- open_hand() is not worked. Function continues to if_continue()
-                money = open_hand(hand, hand_val, dealer_hand, dealer_val, money, put_bet, cards) 
-                if_continue(money, cards)
-                break
-        elif hand_val == 21:
-            money += put_bet
-            print("Blackjack!")
-            print(f"Your money now is ${money}.")
-            if_continue(money, cards)
-            break
+                # --- Opening cards ---
+                print("Open hand.")
+                while True:    
+                    if dealer_value < 17:
+                        print("Dealer's hand is under 17. Dealer will add one more card.")
+                        one_dealer = deal_card(stack, 1)
+                        dealer_hand += one_dealer
+                        dealer_value = value_card(stack, dealer_hand)
+                        print(f"Dealer's hand: {dealer_hand}; value: {dealer_value}.")
+                        continue
+                    elif dealer_value == 21:
+                        print("Dealer blackjack! Player lose.")
+                        chip -= bet
+                    elif dealer_value > 21:
+                        print("Dealer's hand is higher than 21. Player wins.")
+                        chip += bet
+                    else:
+                        if player_value == dealer_value:
+                            print(f"Player value: {player_value}.\nDealer value: {dealer_value}.\nIt's a draw.")
+                            break
+                        elif player_value > dealer_value:
+                            print(f"Player value: {player_value}.\nDealer value: {dealer_value}.\nYou win!")
+                            chip += bet
+                            break
+                        elif player_value < dealer_value:
+                            print(f"Player value: {player_value}.\nDealer value: {dealer_value}.\nYou lose.")
+                            chip -= bet
+                            break
+            break                
+    
+    # --- Checking money. It will pass if money is zero ---
+    if chip <= 0:
+        print("You can't play anymore.")
+        end_game(chip)
+        
+    else:
+        print(f"You have $ {chip} to spend.")
+        start_again = input("Do you want to CONTINUE the game? Press y to continue, press any other keys to stop:  > ").lower()
+        if start_again == "y":
+            blackjack(stack, chip)
         else:
-            money -= put_bet
-            print(f"Your hand value is over than 21. You lose ${put_bet}. Your money now is ${money}.")
-            if_continue(money, cards)
-            break
+            end_game(chip)
             
 
-# ---- PROGRAM STARTS HERE ----
 
-game_21(initial, the_card)
-    
-# !--- Too much stack  ---!
-# !--- After some stacks, program will return initial bet as money ---!
+# --- GAME STARTS HERE ---
+blackjack(deck, account)
