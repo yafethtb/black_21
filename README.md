@@ -4,7 +4,7 @@
 The blackjack rules are simple:
 
     1.  Whoever get the total value more than 21 is automatically lose and lose the bet.
-    2. Whoever get the total value closed to 21 OR exactly 21 is the winner and have get all the bet.
+    2. Whoever get the total value closed to 21 OR exactly 21 is the winner and get all the bet.
 
 ---
 Blackjack algorithm then can be explained as these steps:
@@ -20,9 +20,11 @@ Blackjack algorithm then can be explained as these steps:
 
 --- 
 An extra rule:
-
-    If  dealer's initial cards have value under than 17, dealer draw a card until the value higher than your value OR it exceeded 21.
+If dealer's initial cards have value under than 17, dealer draw a card until the value higher than your value OR it exceeded 21.
 
 ---
 It's a simple set of rules and algorithm, but how to implement it will be quite challenging for my recent knowledge level of programming. 
+
+### New added:
+New version in folder (jack_with_class) consist of three files: card_stack.py(model), the_casino.py (controller), the_table.py(view). I refactoring my previous code to make it easier to understand.
     
